@@ -45,7 +45,7 @@ def search_customer_by_phone(phone):
 def open_order_page(customer=None, phone=None):
     order_page = tk.Toplevel(root)
     order_page.title("Order Detail")
-    order_page.geometry("600x600")
+    order_page.geometry("500x500")
     
     frame = ttk.Frame(order_page, padding="10")
     frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
@@ -152,7 +152,7 @@ def open_work_page():
     # Create the new work page
     work_page = tk.Toplevel(root)
     work_page.title("Search Customer")
-    work_page.geometry("400x200")
+    work_page.geometry("500x100")
     
     # Frame for the new page
     frame = ttk.Frame(work_page, padding="10")
@@ -306,7 +306,7 @@ def search_menu_items(search_term):
 # Main application window (main page)
 root = tk.Tk()
 root.title("Pizza Cashiering System - Main Page")
-root.geometry("600x600")
+root.geometry("500x500")
 
 # Main page components
 frame = ttk.Frame(root, padding="10")
