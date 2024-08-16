@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import sqlite3
+import sqlite3, os, datetime
 
 # Initialize the database
 def init_db():
@@ -44,6 +44,22 @@ def init_db():
     conn.commit()
     conn.close()
 
+# Function to get the next receipt number
+def get_next_receipt_number():
+    if not os.path.exists("receipts"):
+        os.makedirs("receipts")
+    
+    receipt_files = [f for f in os.listdir("receipts") if f.endswith(".txt")]
+    if receipt_files:
+        receipt_numbers = [int(f.split("#")[1].split(".")[0]) for f in receipt_files]
+        return max(receipt_numbers) + 1
+    else:
+        return 1
+
+# Function to get the current timestamp
+def get_current_timestamp():
+    return datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
+
 # Function to search for a customer by phone number
 def search_customer_by_phone(phone):
     conn = sqlite3.connect('customer_info.db')
@@ -54,6 +70,7 @@ def search_customer_by_phone(phone):
     return customer
 
 # Function to open the order detail page
+# Updated order detail page function to pass delivery_fee_entry to finish_order and submit_order
 def open_order_page(customer=None, phone=None):
     order_page = tk.Toplevel(root)
     order_page.title("Order Detail")
@@ -108,11 +125,14 @@ def open_order_page(customer=None, phone=None):
     side_order_label = ttk.Label(frame, text="Side Order:")
     side_order_label.grid(row=7, column=0, sticky=tk.W, pady=10)
 
-    side_search_entry = ttk.Entry(frame, width=30)
-    side_search_entry.grid(row=8, column=0, pady=5)
+    search_label = ttk.Label(frame, text="Search item:")
+    search_label.grid(row=8, column=0, sticky=tk.W, pady=5)
 
-    side_listbox = tk.Listbox(frame, width=40, height=5)
-    side_listbox.grid(row=9, column=0, columnspan=2, pady=5)
+    side_search_entry = ttk.Entry(frame, width=30)
+    side_search_entry.grid(row=8, column=1, pady=5)
+
+    side_listbox = tk.Listbox(frame, width=30, height=3)
+    side_listbox.grid(row=9, column=1, columnspan=2, pady=5)
 
     def update_side_listbox(*args):
         search_term = side_search_entry.get()
@@ -128,7 +148,7 @@ def open_order_page(customer=None, phone=None):
             order_text.insert(tk.END, f"{selected_item}\n")
 
     add_side_button = ttk.Button(frame, text="Add to Order", command=add_side_to_order)
-    add_side_button.grid(row=10, column=0, pady=5)
+    add_side_button.grid(row=10, column=1, pady=5)
 
     # Delivery Fee
     delivery_fee_label = ttk.Label(frame, text="Delivery Fee: ")
@@ -139,7 +159,7 @@ def open_order_page(customer=None, phone=None):
     # Order Notes Section
     order_label = ttk.Label(frame, text="Order Notes:")
     order_label.grid(row=13, column=0, sticky=tk.W, pady=10)
-    order_text = tk.Text(frame, width=40, height=5)
+    order_text = tk.Text(frame, width=40, height=8)
     order_text.grid(row=14, column=0, columnspan=2, pady=5)
 
     # Populate fields if customer data is provided
@@ -160,12 +180,13 @@ def open_order_page(customer=None, phone=None):
 
     order_page.protocol("WM_DELETE_WINDOW", on_close)
 
-    finish_order_button = ttk.Button(frame, text="Finish Order", command=lambda: finish_order(order_text))
+    finish_order_button = ttk.Button(frame, text="Finish Order", command=lambda: finish_order(order_text, delivery_fee_entry))
     finish_order_button.grid(row=15, column=0, pady=20, sticky=tk.W)
 
     submit_button = ttk.Button(frame, text="Submit Order", command=lambda: submit_order(
-        customer_name_entry, customer_address_entry, phone_entry, order_text, order_page))
+        customer_name_entry, customer_address_entry, phone_entry, order_text, delivery_fee_entry, order_page))
     submit_button.grid(row=15, column=1, pady=20)
+
 
 # Function to fetch delivery fee from the database using phone number
 def fetch_delivery_fee(phone, delivery_fee_entry):
@@ -207,7 +228,7 @@ def add_pizza_to_order(pizza_number, pizza_size, order_text):
         #messagebox.showerror("Not Found", "Pizza with this item number does not exist.")
 
 # Function to calculate subtotal, tax, and finish the order
-def finish_order(order_text):
+def finish_order(order_text, delivery_fee_entry):
     lines = order_text.get("1.0", tk.END).strip().split("\n")
     subtotal = 0.00
     for line in lines:
@@ -215,34 +236,40 @@ def finish_order(order_text):
             price = float(line.split('- $')[-1].strip())
             subtotal += price
 
+    delivery_fee = float(delivery_fee_entry.get())
+    subtotal += delivery_fee
     tax = subtotal * 0.05
-    subtotal += tax
-    order_text.insert(tk.END, f"\nTax - ${tax:.2f}\n{'-'*20}\nSubtotal - ${subtotal:.2f}\n")
+    total = subtotal + tax
+
+    order_text.insert(tk.END, f"\n\nDelivery - ${delivery_fee:.2f}\n")
+    order_text.insert(tk.END, f"Tax - ${tax:.2f}\n{'-'*20}\nSubtotal - ${total:.2f}\n")
 
 # Function to submit an order
-def submit_order(customer_name_entry, customer_address_entry, phone_entry, order_text, order_page):
+def submit_order(customer_name_entry, customer_address_entry, phone_entry, order_text, delivery_fee_entry, order_page):
     customer_name = customer_name_entry.get()
     customer_address = customer_address_entry.get()
     phone = phone_entry.get()
     order_details = order_text.get("1.0", tk.END)
-    delivery_fee = calculate_delivery_fee(customer_address)
+    delivery_fee = float(delivery_fee_entry.get())
 
     save_customer(customer_name, customer_address, phone, delivery_fee)
 
-    print(f"Customer Name: {customer_name}")
-    print(f"Customer Address: {customer_address}")
-    print(f"Customer Phone: {phone}")
-    print(f"Order Details: {order_details}")
-    print(f"Delivery Fee: {delivery_fee}")
+    receipt_number = get_next_receipt_number()
+    timestamp = get_current_timestamp()
 
-    with open("reciept.txt", "w") as f:
-        f.write(f"\nCustomer Name: {customer_name}\n")
-        f.write(f"Customer Address: {customer_address}\n")
-        f.write(f"Customer Phone: {phone}\n")
-        f.write(f"\nOrder Details:\n{order_details}\n")
-        f.write(f"Delivery Fee: {delivery_fee}\n")
-    
-    #f.close()
+    receipt_content = f"Receipt# {receipt_number}\n{timestamp}\n\n"
+    receipt_content += f"Customer Name: {customer_name}\n"
+    receipt_content += f"Customer Address: {customer_address}\n"
+    receipt_content += f"Customer Phone: {phone}\n\n"
+    receipt_content += f"Order Details:\n{order_details}\n"
+    receipt_content += f"Delivery Fee: ${delivery_fee:.2f}\n"
+
+    # Save the receipt to a file
+    receipt_filename = f"receipts/Receipt#{receipt_number}.txt"
+    with open(receipt_filename, "w") as f:
+        f.write(receipt_content)
+
+    print(f"Receipt saved as {receipt_filename}")
 
     order_page.destroy()
     open_work_page()

@@ -1,0 +1,18 @@
+Receipt# 1
+1900/01/01 00:00
+
+Customer Name: 
+Customer Address: 
+Customer Phone: 
+
+Order Details:
+#24 Pretty Lady - $20.45
+
+
+Delivery - $0.00
+Tax - $1.02
+--------------------
+Subtotal - $21.47
+
+
+Delivery Fee: $0.00

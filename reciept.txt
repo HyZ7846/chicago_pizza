@@ -5,12 +5,16 @@ Customer Phone: 5875943555
 
 Order Details:
 #24 Pretty Lady - $20.45
-#25 Earth's Harvest - $24.95
+#25 Earth's Harvest - $19.45
+#25 Earth's Harvest - $29.45
 Greek salad - $8.95
+chess - $2
 
-Tax - $2.72
+
+Delivery - $1.00
+Tax - $4.07
 --------------------
-Subtotal - $57.07
+Subtotal - $85.36
 
 
-Delivery Fee: 5.0
+Delivery Fee: $1.00
