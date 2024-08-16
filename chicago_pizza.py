@@ -181,7 +181,7 @@ def fetch_delivery_fee(phone, delivery_fee_entry):
 # Function to add pizza to the order notes
 def add_pizza_to_order(pizza_number, pizza_size, order_text):
     if not pizza_number:
-        messagebox.showerror("Input Error", "Please enter a valid pizza number.")
+        #messagebox.showerror("Input Error", "Please enter a valid pizza number.")
         return
 
     conn = sqlite3.connect('customer_info.db')
@@ -203,7 +203,8 @@ def add_pizza_to_order(pizza_number, pizza_size, order_text):
 
         order_text.insert(tk.END, f"#{pizza_number} {item_name} - ${item_price:.2f}\n")
     else:
-        messagebox.showerror("Not Found", "Pizza with this item number does not exist.")
+        return
+        #messagebox.showerror("Not Found", "Pizza with this item number does not exist.")
 
 # Function to calculate subtotal, tax, and finish the order
 def finish_order(order_text):
@@ -215,6 +216,7 @@ def finish_order(order_text):
             subtotal += price
 
     tax = subtotal * 0.05
+    subtotal += tax
     order_text.insert(tk.END, f"\nTax - ${tax:.2f}\n{'-'*20}\nSubtotal - ${subtotal:.2f}\n")
 
 # Function to submit an order
@@ -232,6 +234,15 @@ def submit_order(customer_name_entry, customer_address_entry, phone_entry, order
     print(f"Customer Phone: {phone}")
     print(f"Order Details: {order_details}")
     print(f"Delivery Fee: {delivery_fee}")
+
+    with open("reciept.txt", "w") as f:
+        f.write(f"\nCustomer Name: {customer_name}\n")
+        f.write(f"Customer Address: {customer_address}\n")
+        f.write(f"Customer Phone: {phone}\n")
+        f.write(f"\nOrder Details:\n{order_details}\n")
+        f.write(f"Delivery Fee: {delivery_fee}\n")
+    
+    #f.close()
 
     order_page.destroy()
     open_work_page()
@@ -274,7 +285,7 @@ def open_work_page():
     # Create the new work page
     work_page = tk.Toplevel(root)
     work_page.title("Search Customer")
-    work_page.geometry("400x200")
+    work_page.geometry("500x100")
     
     # Frame for the new page
     frame = ttk.Frame(work_page, padding="10")
@@ -294,7 +305,7 @@ def open_work_page():
             open_order_page(customer)
             work_page.destroy()  # Close the work page after opening order page
         else:
-            messagebox.showinfo("Customer Not Found", "Customer not found, starting with a blank order page.")
+            #messagebox.showinfo("Customer Not Found", "Customer not found, starting with a blank order page.")
             open_order_page(phone=phone)  # Pass the phone number to pre-fill
             work_page.destroy()  # Close the work page after opening order page
     
