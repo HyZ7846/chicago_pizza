@@ -446,7 +446,7 @@ def add_update_menu_item(item_number_entry, item_name_entry, price_entries, menu
     conn.commit()
     conn.close()
 
-    messagebox.showinfo("Success", f"{menu_type} item added/updated successfully!")
+    #messagebox.showinfo("Success", f"{menu_type} item added/updated successfully!")
     menu_page.destroy()
     open_menu_page(menu_type)
 
