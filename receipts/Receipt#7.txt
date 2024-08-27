@@ -1,0 +1,26 @@
+Receipt# 7
+2024/08/26 15:33
+
+Customer Name: ZHY
+Customer Address: CCIS
+Customer Phone: 123456789
+
+Order Details:
+#24 Pretty Lady - $30.45
+Greek salad - $8.95
+Garlic toast - $2.25
+#30 Mexicana - $30.45
+#30 Mexicana - $30.45
+#30 Mexicana - $30.45
+#30 Mexicana - $30.45
+
+
+Delivery - $2.00
+Tax - $8.27
+--------------------
+Subtotal - $173.72
+
+
+Delivery Fee: $2.00
+
+.

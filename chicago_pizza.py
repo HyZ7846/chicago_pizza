@@ -241,8 +241,8 @@ def finish_order(order_text, delivery_fee_entry):
     tax = subtotal * 0.05
     total = subtotal + tax
 
-    order_text.insert(tk.END, f"\n\nDelivery - ${delivery_fee:.2f}\n")
-    order_text.insert(tk.END, f"Tax - ${tax:.2f}\n{'-'*20}\nSubtotal - ${total:.2f}\n")
+    order_text.insert(tk.END, f"*Delivery - ${delivery_fee:.2f}\n")
+    order_text.insert(tk.END, f"*Tax - ${tax:.2f}\n{'-'*20}\nSubtotal - ${total:.2f}")
 
 # Function to submit an order
 def submit_order(customer_name_entry, customer_address_entry, phone_entry, order_text, delivery_fee_entry, order_page):
@@ -257,12 +257,13 @@ def submit_order(customer_name_entry, customer_address_entry, phone_entry, order
     receipt_number = get_next_receipt_number()
     timestamp = get_current_timestamp()
 
-    receipt_content = f"Receipt# {receipt_number}\n{timestamp}\n\n"
-    receipt_content += f"Customer Name: {customer_name}\n"
-    receipt_content += f"Customer Address: {customer_address}\n"
-    receipt_content += f"Customer Phone: {phone}\n\n"
-    receipt_content += f"Order Details:\n{order_details}\n"
-    receipt_content += f"Delivery Fee: ${delivery_fee:.2f}\n"
+    receipt_content = "CDDP\n--------------------\n"
+    receipt_content += f"#{receipt_number}\n{timestamp}\n--------------------\n"
+    receipt_content += f"{customer_name}\n"
+    receipt_content += f"{phone}\n"
+    receipt_content += f"{customer_address}\n--------------------\n"
+    receipt_content += f"Order Details:\n{order_details}\n--------------------"
+    # receipt_content += f"Delivery Fee: ${delivery_fee:.2f}\n\n."
 
     # Save the receipt to a file
     receipt_filename = f"receipts/Receipt#{receipt_number}.txt"

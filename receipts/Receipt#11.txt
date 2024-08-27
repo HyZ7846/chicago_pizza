@@ -1,0 +1,20 @@
+DDCP
+--------------------
+#11
+2024/08/26 15:49
+--------------------
+Customer Name: ZHY
+Customer Address: CCIS
+Customer Phone: 123456789
+--------------------
+Order Details:
+#24 Pretty Lady - $30.45
+Caesar salad - $8.95
+
+
+Delivery - $200000000.00
+Tax - $10000001.97
+--------------------
+Subtotal - $210000041.37
+
+--------------------
