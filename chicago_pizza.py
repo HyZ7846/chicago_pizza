@@ -134,27 +134,61 @@ def open_order_page(customer=None, phone=None):
     side_listbox = tk.Listbox(frame, width=30, height=3)
     side_listbox.grid(row=9, column=1, columnspan=2, pady=5)
 
+
+    side_size_var = tk.StringVar()
+    side_size_var.set("S")  # Default value
+
+    side_size_s = ttk.Radiobutton(frame, text="S", variable=side_size_var, value="S")
+    side_size_s.grid(row=10, column=1, sticky=tk.W, pady=5)
+
+    side_size_m = ttk.Radiobutton(frame, text="M", variable=side_size_var, value="M")
+    side_size_m.grid(row=10, column=1, padx=50, sticky=tk.W, pady=5)
+
+    side_size_l = ttk.Radiobutton(frame, text="L", variable=side_size_var, value="L")
+    side_size_l.grid(row=10, column=1, padx=100, sticky=tk.W, pady=5)
+
     def update_side_listbox(*args):
         search_term = side_search_entry.get()
         side_listbox.delete(0, tk.END)
         for item in search_menu_items(search_term, "Side"):
-            side_listbox.insert(tk.END, f"{item[1]} - ${item[2]}")
+            side_listbox.insert(tk.END, f"{item[0]} - {item[1]}")
 
     side_search_entry.bind('<KeyRelease>', update_side_listbox)
 
     def add_side_to_order():
         selected_item = side_listbox.get(tk.ACTIVE)
         if selected_item:
-            order_text.insert(tk.END, f"{selected_item}\n")
+            item_number, item_name = selected_item.split(' - ')
+            item_number = int(item_number)
+            side_size = side_size_var.get()
+            
+            conn = sqlite3.connect('customer_info.db')
+            cur = conn.cursor()
+            
+            if side_size == "S":
+                cur.execute('SELECT price_s FROM side_order WHERE item_number = ?', (item_number,))
+            elif side_size == "M":
+                cur.execute('SELECT price_m FROM side_order WHERE item_number = ?', (item_number,))
+            else:  # L
+                cur.execute('SELECT price_l FROM side_order WHERE item_number = ?', (item_number,))
+                
+            price = cur.fetchone()
+            conn.close()
+
+            if price:
+                item_price = price[0]
+                order_text.insert(tk.END, f"#{item_number} {item_name} {side_size} - ${item_price:.2f}\n")
+            else:
+                messagebox.showerror("Error", "Could not find the price for the selected item.")
 
     add_side_button = ttk.Button(frame, text="Add to Order", command=add_side_to_order)
-    add_side_button.grid(row=10, column=1, pady=5)
+    add_side_button.grid(row=11, column=1, pady=5)
 
     # Delivery Fee
     delivery_fee_label = ttk.Label(frame, text="Delivery Fee: ")
-    delivery_fee_label.grid(row=11, column=0, sticky=tk.W, pady=5)
+    delivery_fee_label.grid(row=12, column=0, sticky=tk.W, pady=5)
     delivery_fee_entry = ttk.Entry(frame, width=10)
-    delivery_fee_entry.grid(row=11, column=1, sticky=tk.W, pady=5)
+    delivery_fee_entry.grid(row=12, column=1, sticky=tk.W, pady=5)
 
     # Order Notes Section
     order_label = ttk.Label(frame, text="Order Notes:")
@@ -222,7 +256,7 @@ def add_pizza_to_order(pizza_number, pizza_size, order_text):
         else:
             item_price = pizza[3]
 
-        order_text.insert(tk.END, f"#{pizza_number} {item_name} - ${item_price:.2f}\n")
+        order_text.insert(tk.END, f"#{pizza_number} {item_name} {pizza_size} - ${item_price:.2f}\n")
     else:
         return
         #messagebox.showerror("Not Found", "Pizza with this item number does not exist.")

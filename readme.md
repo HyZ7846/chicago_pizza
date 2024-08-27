@@ -18,11 +18,11 @@ The Pizza Cashiering System is a Python-based desktop application designed to he
 ### Order Detail Page
 - **Customer Information**: Displays fields for entering customer name, address, and phone number.
 - **Pizza Order**: Allows the user to input the pizza number and select the size (S, M, L). The selected pizza is added to the order notes with its price.
-- **Side Orders**: Includes a search bar and listbox for selecting side orders. Selected side orders are added to the order notes.
+- **Side Orders**: Includes a search bar, size buttons (S, M, L) and listbox for selecting side orders. Selected side orders and their size are added to the order notes.
 - **Delivery Fee**: Automatically fetched from the database based on the customer's phone number.
 - **Order Notes**: Displays all added items (pizza and sides) along with their prices. 
-- **Finish Order**: Calculates the subtotal and tax for the order and appends it to the order notes.
-- **Submit Order**: Saves the customer information to the database and finalizes the order.
+- **Finish Order**: Calculates the subtotal and tax for the order and appends it to the order notes. Generate the receipt-like txt file prepare for printing.
+- **Submit Order**: Saves the customer information to the database and finalizes the order. Generate a txt file receipt into `receipts` folder.
 
 ### Menu Management Pages
 - **Add/Update Items**: Allows users to add or update items in the pizza or side menu. Each item includes an item number, name, and prices for small, medium, and large sizes.
@@ -38,8 +38,8 @@ The application uses an `SQLite` database (`customer_info.db`) to store:
 ## Requirements
 
 - Python 3.x
-- Tkinter (usually included with Python)
-- SQLite3 (included with Python)
+- Tkinter (included within Python)
+- SQLite3 (included within Python)
 
 ## How to Run
 
